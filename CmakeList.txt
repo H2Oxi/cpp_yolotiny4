@@ -1,0 +1,21 @@
+# 最小版本，可以通过cmake --version查看
+cmake_minimum_required(VERSION 3.22.1)
+ 
+# 项目名称，建议大写
+project(TST)
+ 
+# 搜索自定义的头文件目录，可以使用绝对路径 ${CMAKE_SOURCE_DIR}/include
+include_directories(layer)
+ 
+# 设置编译时的选项，如O2优化，开启警告,使用的C++标准等
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+ 
+# 调试时使用该项
+set(CMAKE_BUILD_TYPE Debug)
+ 
+ 
+# 生成可执行文件命令，第一个参数是生成可执行文件的名称，后面的参数是源文件代码
+add_executable(main tst1.cpp layer/base_layer.cpp)
+ 
+# 指定生成可执行文件的输出目录
+set(EXECUTABLE_OUTPUT_PATH "./out")
