@@ -27,3 +27,16 @@ class conv_2d
         void padding_forward(data_t *x ,int32_t *out);
       
 };
+
+
+class leakyrelu
+{
+    private:
+        unsigned short int S_relu;
+        unsigned int S_bitshift;
+
+    public:
+        leakyrelu(unsigned short int S_relu,unsigned int S_bitshift) ;
+        void forward(data_t *x,data_t *out);
+
+};
