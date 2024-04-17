@@ -29,14 +29,3 @@ class conv_2d
 };
 
 
-class leakyrelu
-{
-    private:
-        unsigned short int S_relu;
-        unsigned int S_bitshift;
-
-    public:
-        leakyrelu(unsigned short int S_relu,unsigned int S_bitshift) ;
-        void forward(data_t *x,data_t *out);
-
-};

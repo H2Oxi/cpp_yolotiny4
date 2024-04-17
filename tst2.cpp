@@ -2,7 +2,7 @@
 #include <fstream>  
 #include <vector>  
 #include <string>  
-#include "base_layer.h"
+#include "/home/derui/work/C_proj/yolo_v4_tiny_baseline/layer/base_layer.h"
 
 using namespace std; 
 
@@ -229,7 +229,7 @@ data_t * flatten_3d(data_t *** arr,int size2,int size1,int size0)
 
 
 
-
+const string syn_data_dir = "/home/derui/work/Py_proj/yolo_tiny_v4_baseline/hw_tst/conv1_relu0125/int8_m16/";
 const string data_dir = "data_tst/conv1_again/int8_m15/";
 
 //void load_int_data(int8_t *buffer , dir);
@@ -246,10 +246,13 @@ int main() {
     int8_t weights[32*3*3*3];
     int32_t Out[32*208*208];
     tensor_init(Out,32*208*208);
-    load_int8_data(in ,  data_dir +"in_q.bin", sizeof(in)); 
-    load_int8_data(weights ,  data_dir +"w_q.bin" , sizeof(weights)); 
 
-    for (int i =0;i<1;i++)
+    std::cout<<"w_size:"<<sizeof(weights)<<endl;
+    load_int8_data(in ,  syn_data_dir +"in_q.bin", sizeof(in)); 
+    load_int8_data(weights ,  syn_data_dir +"w_q.bin" , sizeof(weights)); 
+    
+
+    for (int i =0;i<32;i++)
     {
         for (int j=0;j<3;j++)
         {
@@ -266,7 +269,7 @@ int main() {
     std::cout<<endl;
     }
 
-    load_int32_data(bias ,  data_dir +"b_q.bin" , sizeof(bias));   
+    load_int32_data(bias ,  syn_data_dir +"b_q.bin" , sizeof(bias));   
 
     cout << "start!" <<endl;
     unsigned int in_shape_i[3]={3,416,416};
@@ -277,7 +280,7 @@ int main() {
     conv1_tst.padding_forward(&in[0],&Out[0]);
     
     
-    save_int32_data(Out ,data_dir +"out_q.bin" ,32*208*208);
+    save_int32_data(Out ,syn_data_dir +"out_q.bin" ,32*208*208);
       
     return 0;  
 }

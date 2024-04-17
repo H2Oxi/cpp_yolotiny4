@@ -7,8 +7,27 @@
 
 using namespace std; 
 
+
+
+
+const string syn_data_dir = "/home/derui/work/Py_proj/yolo_tiny_v4_baseline/hw_tst/conv1_relu0125/int8_m16/";
+const string data_dir = "data_tst/conv1_again/int8_m15/";
+
+//void load_int_data(int8_t *buffer , dir);
+int load_int8_data(int8_t *buffer , const string dir,streamsize size);
+int load_int16_data(int16_t *buffer , const string dir,streamsize size);
+int load_int32_data(int32_t *buffer , const string dir,streamsize size);
+int save_int32_data(int32_t *buffer ,const string dir ,int size);
+int save_int8_data(int8_t *buffer ,const string dir ,int size);
+void print_out_tensor(int32_t * out ,int cho,int width);
+void tensor_int32_init(int32_t * tensor,int size );
+void tensor_int8_init(int8_t * tensor,int size );
+void tensor2int8(int32_t * in,int8_t * out,int size0,int size1,int size2);
+
+
+
 //////////////////
-conv_2d::conv_2d(unsigned int in_shape_i[3],unsigned int output_channels_i,unsigned int ksize_i,unsigned int stride_i )
+void conv_2d::init(unsigned int in_shape_i[3],unsigned int output_channels_i,unsigned int ksize_i,unsigned int stride_i )
 {
     for(int i=0;i<3;i++)
     {
@@ -143,7 +162,14 @@ void conv_2d::padding_forward(data_t *x ,int32_t *out)
                         if((kc==ksize-1)&&(kr==ksize-1))
                         {
                             *(out+out_offset) += bias[o];
+                            if(out_offset==0)
+                                std::cout<<"out["<< out_offset <<"]="<<*(out+out_offset);
                             *(out+out_offset) = ((*(out+out_offset)) * this->m0 )>>15;
+                            if(out_offset==0)
+                            {
+                                std::cout<<"out["<< out_offset <<"]="<<*(out+out_offset);
+                                std::cout<<endl;
+                            }
                         }
 						
 					}
@@ -156,7 +182,7 @@ void conv_2d::padding_forward(data_t *x ,int32_t *out)
 }
 
 //////////////////////////////
-leakyrelu::leakyrelu(unsigned int in_shape_i[3]) 
+void leakyrelu::init(unsigned int in_shape_i[3]) 
 {
     for(int i=0;i<3;i++)
     {
@@ -188,12 +214,12 @@ void leakyrelu::forward(data_t *x,int32_t *out)
                 if(* (x +x_offset)>=0)
                 {
                     *(out+x_offset) = (* (x +x_offset)) * S_relu ;
-                    *(out+x_offset) = *(out+x_offset) >> (S_bitshift);
+                    *(out+x_offset) = *(out+x_offset) >> (S_bitshift-1);
                 }
                 else
                 {
                     *(out+x_offset) = (* (x +x_offset)) * S_relu ;
-                    *(out+x_offset) = *(out+x_offset) >> (S_bitshift+3);
+                    *(out+x_offset) = *(out+x_offset) >> (S_bitshift-1+3);
                 }
 
 			}
@@ -205,7 +231,7 @@ void leakyrelu::forward(data_t *x,int32_t *out)
 
 
 
-maxpooling::maxpooling(unsigned int in_shape[3],unsigned int ksize,unsigned int stride )
+void maxpooling::init(unsigned int in_shape[3],unsigned int ksize,unsigned int stride )
 {
     for(int i=0;i<3;i++)
     {
@@ -261,6 +287,84 @@ data_t maxpooling::find_max(data_t x0,data_t x1,data_t x2,data_t x3)
     return max;  
 }
 ////////////////////////////////
+
+void basic_conv::init(unsigned int in_shape[3],unsigned int output_channels,unsigned int ksize,unsigned int stride)
+{
+    this->conv.init(in_shape ,output_channels ,ksize ,stride);
+    this->activation.init(this->conv.out_shape);
+    
+}
+
+void basic_conv::data_update(const string file_dir)
+{
+    //int32_t *bias;
+    conv.bias = new int32_t[this->conv.output_channels];
+    //int8_t *weights;
+
+    conv.weights = new int8_t[conv.output_channels*conv.in_channels*conv.ksize*conv.ksize]; 
+    
+    int8_t m0_temp[1];
+    int16_t m0 [1];
+    int16_t s0 [1];
+
+    load_int8_data(conv.weights ,  file_dir +"w_q.bin" , conv.output_channels*conv.in_channels*conv.ksize*conv.ksize); 
+    load_int8_data(m0_temp , file_dir +"m_0.bin" , 1);
+
+
+
+    * m0 = static_cast<int16_t> (* m0_temp);
+    cout<< * m0 <<endl;
+    cout<<conv.output_channels<<endl;
+    load_int32_data(conv.bias ,  file_dir +"b_q.bin" , streamsize (4*conv.output_channels)); 
+
+    for (int i=0;i<conv.output_channels;i++)
+    {
+        cout<<conv.bias[i]<<" ";
+        cout<<endl;
+    }
+
+    conv.data_update(&conv.weights[0],&conv.bias[0],* m0);
+
+    load_int16_data(s0 , file_dir +"S_relu_q.bin" , 2);
+    activation.S_update(* s0,15);
+
+}
+
+void basic_conv::forward(data_t *x,data_t *out)
+{
+    int32_t *buffer1;
+    buffer1 = new int32_t[conv.out_shape[0]*conv.out_shape[1]*conv.out_shape[2]];
+    tensor_int32_init(buffer1,conv.out_shape[0]*conv.out_shape[1]*conv.out_shape[2]);
+
+    conv.padding_forward(x,buffer1);
+
+    save_int32_data(buffer1, syn_data_dir + "conv_Out_q32.bin" , 32*208*208);
+    delete [] conv.bias,conv.weights,x;
+
+    int8_t *conv_out;
+    conv_out = new int8_t[conv.out_shape[0]*conv.out_shape[1]*conv.out_shape[2]];
+    tensor2int8(buffer1,conv_out,conv.out_shape[0],conv.out_shape[1],conv.out_shape[2]);
+    save_int8_data(conv_out, syn_data_dir + "conv_Out_q8.bin" , 32*208*208);
+    
+
+    delete [] buffer1;
+
+    int32_t *buffer2;
+    buffer2 = new int32_t[conv.out_shape[0]*conv.out_shape[1]*conv.out_shape[2]];
+    
+    tensor_int32_init(buffer2,conv.out_shape[0]*conv.out_shape[1]*conv.out_shape[2]);
+
+    activation.forward(conv_out,buffer2);
+    delete [] conv_out;
+
+    tensor2int8(buffer2,out,conv.out_shape[0],conv.out_shape[1],conv.out_shape[2]);
+    delete [] buffer2;
+
+}
+
+
+
+//////////////////////////////////
 
 
 data_t*** padArray(const data_t* originalArray,int chi, int originalRows, int originalCols) {  
@@ -332,6 +436,22 @@ data_t * flatten_3d(data_t *** arr,int size2,int size1,int size0)
     return arr_1d;
 }
 
+void tensor2int8(int32_t * in,int8_t * out,int size0,int size1,int size2)
+{
+    for (int i=0;i<size0;i++)
+        for ( int j = 0;j<size1;j++)
+            for ( int k = 0; k < size2 ; k ++ )
+                {
+                    //in[i][j][k]
+                    if ( in[(i*size1+j)*size2+k] >127)
+                        out[(i*size1+j)*size2+k] = 127 ;
+                    else if ( in[(i*size1+j)*size2+k] <-128 )
+                        out[(i*size1+j)*size2+k] = -128 ;
+                    else 
+                        out[(i*size1+j)*size2+k] = static_cast<int8_t>(in[(i*size1+j)*size2+k]);
+
+                }
+}
 
 ///////////////////////
 
@@ -339,45 +459,37 @@ data_t * flatten_3d(data_t *** arr,int size2,int size1,int size0)
 
 
 
-const string syn_data_dir = "/home/derui/work/Py_proj/yolo_tiny_v4_baseline/hw_tst/conv1_relu0125/int8_m16/";
-const string data_dir = "data_tst/conv1_again/int8_m15/";
 
-//void load_int_data(int8_t *buffer , dir);
-int load_int8_data(int8_t *buffer , const string dir,streamsize size);
-int load_int16_data(int16_t *buffer , const string dir,streamsize size);
-int load_int32_data(int32_t *buffer , const string dir,streamsize size);
-int save_int32_data(int32_t *buffer ,const string dir ,int size);
-void print_out_tensor(int32_t * out ,int cho,int width);
-void tensor_init(int32_t * tensor,int size );
   
 int main() {  
     
-    int8_t in[3*416*416]; 
-    int32_t bias[32];
-    int8_t weights[32*3*3*3];
-    int32_t Out[32*208*208];
-    int16_t * m0;
-    tensor_init(Out,32*208*208);
-    load_int8_data(in ,  syn_data_dir +"in_q.bin", sizeof(in)); 
-    load_int8_data(weights ,  syn_data_dir +"w_q.bin" , sizeof(weights)); 
-    load_int16_data(m0 , syn_data_dir +"m_0.bin" , 2);
-    load_int32_data(bias ,  syn_data_dir +"b_q.bin" , sizeof(bias));   
-
+    int8_t *in;
+    in=new int8_t[3*416*416]; 
+    load_int8_data(in ,  syn_data_dir +"in_q.bin", 3*416*416); 
     cout << "start!" <<endl;
     unsigned int in_shape_i[3]={3,416,416};
-
-    conv_2d conv1_tst(&in_shape_i[0],32,3,2);
-    conv1_tst.data_update(&weights[0],&bias[0],* m0);
-
-    conv1_tst.padding_forward(&in[0],&Out[0]);
+    basic_conv conv1_tst;
+    conv1_tst.init(&in_shape_i[0],32,3,2);
+    conv1_tst.data_update(syn_data_dir);
+    int8_t *Out;
+    Out = new int8_t[32*208*208];
+    conv1_tst.forward(&in[0],Out);
     
+    save_int8_data(Out, syn_data_dir + "acc_Out_q.bin" , 32*208*208);
+    delete [] Out;
     
-    save_int32_data(Out ,syn_data_dir +"out_q_conv1.bin" ,32*208*208);
       
     return 0;  
 }
 
-void tensor_init(int32_t * tensor,int size )
+void tensor_int32_init(int32_t * tensor,int size )
+{
+    for (int i=0;i<size;i++)
+    {
+        tensor[i]=0;
+    }
+}
+void tensor_int8_init(int8_t * tensor,int size )
 {
     for (int i=0;i<size;i++)
     {
@@ -485,3 +597,27 @@ int save_int32_data(int32_t *buffer ,const string dir ,int size)
     std::cout << "数组已成功保存到二进制文件。\n"; 
     return 0; 
 }
+
+int save_int8_data(int8_t *buffer ,const string dir ,int size)
+{
+    // 打开一个二进制文件进行写入  
+    std::ofstream binFile(dir, std::ios::out | std::ios::binary);  
+  
+    // 检查文件是否成功打开  
+    if (!binFile) {  
+        std::cerr << "无法打开文件\n";  
+        return 1;  
+    }  
+  
+    // 将数组写入文件  
+    for (int i = 0; i < size; ++i) {  
+        binFile.write(reinterpret_cast<const char*>(&buffer[i]), sizeof(buffer[i]));  
+    } 
+  
+    // 关闭文件  
+    binFile.close();  
+  
+    std::cout << "数组已成功保存到二进制文件。\n"; 
+    return 0; 
+}
+
