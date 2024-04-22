@@ -234,6 +234,7 @@ const string data_dir = "data_tst/conv1_again/int8_m15/";
 
 //void load_int_data(int8_t *buffer , dir);
 int load_int8_data(int8_t *buffer , const string dir,streamsize size);
+int load_int16_data(int16_t *buffer , const string dir,streamsize size);
 int load_int32_data(int32_t *buffer , const string dir,streamsize size);
 int save_int32_data(int32_t *buffer ,const string dir ,int size);
 void print_out_tensor(int32_t * out ,int cho,int width);
@@ -250,7 +251,10 @@ int main() {
     std::cout<<"w_size:"<<sizeof(weights)<<endl;
     load_int8_data(in ,  syn_data_dir +"in_q.bin", sizeof(in)); 
     load_int8_data(weights ,  syn_data_dir +"w_q.bin" , sizeof(weights)); 
-    
+    const string syn_int8m16_dir = "/home/derui/work/Py_proj/yolo_tiny_v4_baseline/my_int_weights_relu0125/int8_M16/";
+    int16_t m0[1];
+    load_int16_data(m0 , syn_int8m16_dir +"backbone/conv1/m_0.bin" , 2);
+    std::cout<<"m0: "<<m0[0]<<endl;
 
     for (int i =0;i<32;i++)
     {
@@ -312,6 +316,26 @@ void print_out_tensor(int32_t * out ,int cho,int width)
 
 
 int load_int8_data(int8_t *buffer , const string dir,streamsize size)
+{
+    std::ifstream file(dir, std::ios::binary | std::ios::in);  
+      
+    if (!file) {  
+        std::cerr << "无法打开文件" << std::endl;  
+        return 1;  
+    }  
+
+      
+    if (!file.read(reinterpret_cast<char*>(buffer), size)) {  
+
+        std::cerr << "读取文件时出错" << std::endl;  
+        return 1;  
+    } 
+    // 关闭文件  
+    file.close(); 
+    return 0;
+}
+
+int load_int16_data(int16_t *buffer , const string dir,streamsize size)
 {
     std::ifstream file(dir, std::ios::binary | std::ios::in);  
       

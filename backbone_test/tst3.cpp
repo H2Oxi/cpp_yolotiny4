@@ -3,7 +3,7 @@
 #include <vector>  
 #include <string>  
 
-#include "/home/derui/work/C_proj/yolo_v4_tiny_baseline/backbone_Conv1_test/base_layer.h"
+#include "/home/derui/work/C_proj/yolo_v4_tiny_baseline/backbone_test/base_layer.h"
 
 using namespace std; 
 
@@ -12,6 +12,7 @@ using namespace std;
 
 const string syn_data_dir = "/home/derui/work/Py_proj/yolo_tiny_v4_baseline/hw_tst/conv1_relu0125/int8_m16/";
 const string data_dir = "data_tst/conv1_again/int8_m15/";
+const string syn_int8m16_dir = "/home/derui/work/Py_proj/yolo_tiny_v4_baseline/my_int_weights_relu0125/int8_M16/";
 
 //void load_int_data(int8_t *buffer , dir);
 int load_int8_data(int8_t *buffer , const string dir,streamsize size);
@@ -23,7 +24,7 @@ void print_out_tensor(int32_t * out ,int cho,int width);
 void tensor_int32_init(int32_t * tensor,int size );
 void tensor_int8_init(int8_t * tensor,int size );
 void tensor2int8(int32_t * in,int8_t * out,int size0,int size1,int size2);
-
+void concatenate(int8_t * tensor0,int8_t * tensor1, int8_t * out,int channels,int width);
 
 
 //////////////////
@@ -52,13 +53,10 @@ void conv_2d::data_update(data_t * weights,int32_t * bias , int16_t m0)
 }
 
 
-void conv_2d::forward(data_t *x ,data_t *out)
+void conv_2d::forward(data_t *x ,int32_t *out)
 {
 
-//multi_loop
-// multi(data_t In[Pif][S*Pr+K-S][S*Pc+K-S],data_t W[Pof][Pif][K][K],data_t Out[Pof][Pr][Pc],data_t W_bn[Pof][Pr][Pc])
-    int out_0_count=0;
-    int full_count=0;
+
 	//Kernel_Row:
 	for(int kr=0;kr<ksize;kr++)
 	{
@@ -79,27 +77,18 @@ void conv_2d::forward(data_t *x ,data_t *out)
 						for(int in=0;in<in_channels;in++)
 						{
                             //out[o][r][c]+=x[in][stride*r+kr][stride*c+kc]*this->weights[o][in][kr][kc]+this->bias[o]
-                            int x_offset=(in*(in_shape[1]+1)+stride*r+kr)*(in_shape[1]+1)+stride*c+kc;//((stride*c+kc)*(this->in_shape[2])+stride*r+kr)*(this->in_shape[1])+in;
+                            int x_offset=(in*(in_shape[1])+stride*r+kr)*(in_shape[2])+stride*c+kc;//((stride*c+kc)*(this->in_shape[2])+stride*r+kr)*(this->in_shape[1])+in;
                             int w_offset=((o*in_channels+in)*ksize+kr)*ksize+kc;//((kc*ksize+kr)*ksize+in)*in_channels+o;
                      
-                            *(out+out_offset)+= (* (x +x_offset))* (*(weights+w_offset));
-                            if( out_offset ==0)
-                            {   
-                                out_0_count++;
-                                cout << "out[" << out_offset << "]="<< *(out+out_offset) <<endl;
-                                cout << "x[" << x_offset << "]="<< (* (x +x_offset)) << ","<< in <<  ","<<stride*r+kr << ","<< stride*c+kc <<endl;
-                                cout << "w[" << w_offset << "]="<< (*(weights+w_offset)) <<endl;
-                            }
-                            full_count++;
-
+                            *(out+out_offset)+= (* (x +x_offset))* (*(weights+w_offset));               
                             
-
-
-                            
+                         
 						}
                         if((kc==ksize-1)&&(kr==ksize-1))
                         {
                             *(out+out_offset) += bias[o];
+                            *(out+out_offset) = ((*(out+out_offset)) * this->m0 )>>15;
+
                         }
 						
 					}
@@ -108,8 +97,6 @@ void conv_2d::forward(data_t *x ,data_t *out)
 			}
 		}
 	}
-    cout << " out0_count:" << out_0_count <<endl;
-    cout << " full_count:" << full_count <<endl;
 
 }
 
@@ -137,7 +124,7 @@ void conv_2d::padding_forward(data_t *x ,int32_t *out)
 						for(int in=0;in<in_channels;in++)
 						{
                             
-                            if( ((stride*r+kr)==0)||((stride*c+kc)==0))
+                            if( ((stride*r+kr)==0)||((stride*c+kc)==0)||( (stride*c+kc)==1+in_shape[2] )|| ( (stride*r+kr)==1+in_shape[1] ))
                             {
 
                             }
@@ -147,13 +134,14 @@ void conv_2d::padding_forward(data_t *x ,int32_t *out)
                             
                      
                             *(out+out_offset)+= (* (x +x_offset))* (*(weights+w_offset));
-                            if(out_offset==0)
+                            /*if(out_offset==0)
                             {
                                 std::cout<<"x "<< in << " "<< (stride*r+kr-1)<<" "<< (stride*c+kc-1) << "="<< static_cast<int>(* (x +x_offset))<<"(x_offset:"<<x_offset<<")";
                                 std::cout<<"w "<< o << " "<< in << " "<< kr << " "<< kc << "="<<static_cast<int>(*(weights+w_offset))<<"(w_offset:"<<w_offset<<")";
                                 std::cout<<"out[0]="<<*(out+0);
                                 std::cout<<endl;
                             }
+                            */
                             }
 
                             
@@ -162,14 +150,14 @@ void conv_2d::padding_forward(data_t *x ,int32_t *out)
                         if((kc==ksize-1)&&(kr==ksize-1))
                         {
                             *(out+out_offset) += bias[o];
-                            if(out_offset==0)
-                                std::cout<<"out["<< out_offset <<"]="<<*(out+out_offset);
+                            /*if(out_offset==0)
+                                std::cout<<"out["<< out_offset <<"]="<<*(out+out_offset);*/
                             *(out+out_offset) = ((*(out+out_offset)) * this->m0 )>>15;
-                            if(out_offset==0)
+                            /*if(out_offset==0)
                             {
                                 std::cout<<"out["<< out_offset <<"]="<<*(out+out_offset);
                                 std::cout<<endl;
-                            }
+                            }*/
                         }
 						
 					}
@@ -303,25 +291,18 @@ void basic_conv::data_update(const string file_dir)
 
     conv.weights = new int8_t[conv.output_channels*conv.in_channels*conv.ksize*conv.ksize]; 
     
-    int8_t m0_temp[1];
+    
     int16_t m0 [1];
     int16_t s0 [1];
 
     load_int8_data(conv.weights ,  file_dir +"w_q.bin" , conv.output_channels*conv.in_channels*conv.ksize*conv.ksize); 
-    load_int8_data(m0_temp , file_dir +"m_0.bin" , 1);
+    load_int16_data(m0 , file_dir +"m_0.bin" , 2);
 
-
-
-    * m0 = static_cast<int16_t> (* m0_temp);
     cout<< * m0 <<endl;
-    cout<<conv.output_channels<<endl;
+    
     load_int32_data(conv.bias ,  file_dir +"b_q.bin" , streamsize (4*conv.output_channels)); 
 
-    for (int i=0;i<conv.output_channels;i++)
-    {
-        cout<<conv.bias[i]<<" ";
-        cout<<endl;
-    }
+
 
     conv.data_update(&conv.weights[0],&conv.bias[0],* m0);
 
@@ -334,17 +315,21 @@ void basic_conv::forward(data_t *x,data_t *out)
 {
     int32_t *buffer1;
     buffer1 = new int32_t[conv.out_shape[0]*conv.out_shape[1]*conv.out_shape[2]];
-    tensor_int32_init(buffer1,conv.out_shape[0]*conv.out_shape[1]*conv.out_shape[2]);
-
-    conv.padding_forward(x,buffer1);
-
-    save_int32_data(buffer1, syn_data_dir + "conv_Out_q32.bin" , 32*208*208);
-    delete [] conv.bias,conv.weights,x;
+    fill_n(buffer1,conv.out_shape[0]*conv.out_shape[1]*conv.out_shape[2],0);
+    //tensor_int32_init(buffer1,conv.out_shape[0]*conv.out_shape[1]*conv.out_shape[2]);
+    if(conv.ksize==3)
+        conv.padding_forward(x,buffer1);
+    else
+        conv.forward(x,buffer1);
+    delete [] conv.bias;
+    delete [] conv.weights;
+    
 
     int8_t *conv_out;
     conv_out = new int8_t[conv.out_shape[0]*conv.out_shape[1]*conv.out_shape[2]];
+
     tensor2int8(buffer1,conv_out,conv.out_shape[0],conv.out_shape[1],conv.out_shape[2]);
-    save_int8_data(conv_out, syn_data_dir + "conv_Out_q8.bin" , 32*208*208);
+    
     
 
     delete [] buffer1;
@@ -362,9 +347,169 @@ void basic_conv::forward(data_t *x,data_t *out)
 
 }
 
+////////////////////////////////
+
+void resblock_body::init(string name ,unsigned int in_shape[3] , unsigned int output_channels )
+{
+    this->name=name;
+    for(int i=0;i<3;i++)
+    {
+        this->in_shape[i]=in_shape[i];
+    }
+    this->output_channels = output_channels;
+    this->conv1.init(this->in_shape,output_channels,3,1);
+    this->conv4.init(this->in_shape,output_channels,1,1);
+    this->in_shape[0]=in_shape[0]/2;
+    this->conv2.init(this->in_shape,output_channels/2,3,1);
+    this->conv3.init(this->in_shape,output_channels/2,3,1);
+
+    this->in_shape[0]=in_shape[0]*2;
+    this->maxpool1.init(this->in_shape,2,2);
+
+}
+
+void resblock_body::forward(data_t *x,data_t *out0,data_t *out1)
+{
+    string data_dir=syn_int8m16_dir + "backbone/";
+    //conv1
+    conv1.data_update(data_dir+name+"/conv1/");
+    int8_t *Out1;
+    Out1 = new int8_t[conv1.conv.in_shape[0]*conv1.conv.in_shape[1]*conv1.conv.in_shape[2]];
+    fill_n(Out1,conv1.conv.in_shape[0]*conv1.conv.in_shape[1]*conv1.conv.in_shape[2],0);
+    conv1.forward(x,Out1);
+    delete [] x;
+    //conv2
+    conv2.data_update(data_dir+name+"/conv2/");
+    int8_t *Out2;
+    Out2 = new int8_t[conv2.conv.in_shape[0]*conv2.conv.in_shape[1]*conv2.conv.in_shape[2]];
+    fill_n(Out2,conv2.conv.in_shape[0]*conv2.conv.in_shape[1]*conv2.conv.in_shape[2],0);
+    conv2.forward(&Out1[conv1.conv.in_shape[0]*conv1.conv.in_shape[1]*conv1.conv.in_shape[2]/2-1],Out2);
+    //conv3
+    conv3.data_update(data_dir+name+"/conv3/");
+    int8_t *Out3;
+    Out3 = new int8_t[conv3.conv.in_shape[0]*conv3.conv.in_shape[1]*conv3.conv.in_shape[2]];
+    fill_n(Out3,conv3.conv.in_shape[0]*conv3.conv.in_shape[1]*conv3.conv.in_shape[2],0);
+    conv3.forward(Out2,Out3);
+    //conv4
+    conv4.data_update(data_dir+name+"/conv4/");
+    int8_t *in4;
+    in4 = new int8_t[conv4.conv.in_shape[0]*conv4.conv.in_shape[1]*conv4.conv.in_shape[2]];
+    fill_n(in4,conv4.conv.in_shape[0]*conv4.conv.in_shape[1]*conv4.conv.in_shape[2],0);
+    //int8_t *Out4;//feat
+    //Out4 = new int8_t[conv4.conv.in_shape[0]*conv4.conv.in_shape[1]*conv4.conv.in_shape[2]];
+    //fill_n(Out4,conv4.conv.in_shape[0]*conv4.conv.in_shape[1]*conv4.conv.in_shape[2],0);
+    /*
+    cout<<"out2-size:"<<conv2.conv.in_shape[0]<<"  "<<conv2.conv.in_shape[1]<<endl;
+    cout<<"out3-size:"<<conv3.conv.in_shape[0]<<"  "<<conv3.conv.in_shape[1]<<endl;
+    cout<<"in4-size:"<<conv4.conv.in_shape[0]<<"  "<<conv4.conv.in_shape[1]<<endl;
+    */
+    concatenate(Out3,Out2,in4,conv2.conv.in_shape[0],conv2.conv.in_shape[1]);
+    delete [] Out2;
+    delete [] Out3;
+    conv4.forward(in4,out1);
+    delete [] in4;
+    //maxpool1
+    int8_t *in5;
+    in5 = new int8_t[maxpool1.in_shape[0]*maxpool1.in_shape[1]*maxpool1.in_shape[2]];
+    fill_n(in5,maxpool1.in_shape[0]*maxpool1.in_shape[1]*maxpool1.in_shape[2],0);
+    concatenate(Out1,out1,in5,conv1.conv.in_shape[0],conv1.conv.in_shape[1]);
+    //int8_t *Out5;
+    //Out5 = new int8_t[maxpool1.out_shape[0]*maxpool1.out_shape[1]*maxpool1.out_shape[2]];
+    //fill_n(Out5,maxpool1.out_shape[0]*maxpool1.out_shape[1]*maxpool1.out_shape[2],0);
+    delete [] Out1;
+    maxpool1.forward(in5,out0);
+    delete [] in5;
+    //
+    //out0=Out5;
+    //out1=Out4;
+}
 
 
 //////////////////////////////////
+
+void csp_dark_net::init()
+{
+    unsigned int conv1_in_shape[]={3,416,416};
+    this->conv1.init(conv1_in_shape,32,3,2);
+    unsigned int conv2_in_shape[]={32,208,208};
+    this->conv2.init(conv2_in_shape,64,3,2);
+    unsigned int resblock1_in_shape[]={64,104,104};
+    this->resblock_body1.init("resblock_body1",resblock1_in_shape,64);
+    unsigned int resblock2_in_shape[]={128,52,52};
+    this->resblock_body2.init("resblock_body2",resblock2_in_shape,128);
+    unsigned int resblock3_in_shape[]={256,26,26};
+    this->resblock_body3.init("resblock_body3",resblock3_in_shape,256);
+    unsigned int conv3_in_shape[]={512,13,13};
+    this->conv3.init(conv3_in_shape,512,3,1);
+
+}
+
+void csp_dark_net::forward(data_t *x,data_t *out0,data_t *out1)
+{
+    string data_dir=syn_int8m16_dir + "backbone/";
+    //conv1
+    conv1.data_update(data_dir+"/conv1/"); 
+    int8_t *Out1;
+    Out1 = new int8_t[conv1.conv.out_shape[0]*conv1.conv.out_shape[1]*conv1.conv.out_shape[2]];
+    fill_n(Out1,conv1.conv.out_shape[0]*conv1.conv.out_shape[1]*conv1.conv.out_shape[2],0);
+    conv1.forward(x,Out1);   
+    delete [] x;
+    //conv2
+    conv2.data_update(data_dir+"/conv2/"); 
+    int8_t *Out2;
+    Out2 = new int8_t[conv2.conv.out_shape[0]*conv2.conv.out_shape[1]*conv2.conv.out_shape[2]];
+    fill_n(Out2,conv2.conv.out_shape[0]*conv2.conv.out_shape[1]*conv2.conv.out_shape[2],0);
+    conv2.forward(Out1,Out2);
+    delete [] Out1;
+    //resblock_body1
+    int8_t *out0_res1;
+    int8_t *out1_res1;
+    out0_res1 = new int8_t[resblock_body1.maxpool1.out_shape[0]*resblock_body1.maxpool1.out_shape[1]*resblock_body1.maxpool1.out_shape[2]];
+    fill_n(out0_res1,resblock_body1.maxpool1.out_shape[0]*resblock_body1.maxpool1.out_shape[1]*resblock_body1.maxpool1.out_shape[2],0);
+    out1_res1 = new int8_t[resblock_body1.conv4.conv.in_shape[0]*resblock_body1.conv4.conv.in_shape[1]*resblock_body1.conv4.conv.in_shape[2]];
+    fill_n(out1_res1,resblock_body1.conv4.conv.in_shape[0]*resblock_body1.conv4.conv.in_shape[1]*resblock_body1.conv4.conv.in_shape[2],0);
+
+    resblock_body1.forward(Out2,out0_res1,out1_res1);
+    
+    delete [] out1_res1;
+    //resblock_body2
+    int8_t *out0_res2;
+    int8_t *out1_res2;
+    out0_res2 = new int8_t[resblock_body2.maxpool1.out_shape[0]*resblock_body2.maxpool1.out_shape[1]*resblock_body2.maxpool1.out_shape[2]];
+    fill_n(out0_res2,resblock_body2.maxpool1.out_shape[0]*resblock_body2.maxpool1.out_shape[1]*resblock_body2.maxpool1.out_shape[2],0);
+    out1_res2 = new int8_t[resblock_body2.conv4.conv.in_shape[0]*resblock_body2.conv4.conv.in_shape[1]*resblock_body2.conv4.conv.in_shape[2]];
+    fill_n(out1_res2,resblock_body2.conv4.conv.in_shape[0]*resblock_body2.conv4.conv.in_shape[1]*resblock_body2.conv4.conv.in_shape[2],0);
+    resblock_body2.forward(out0_res1,out0_res2,out1_res2);
+    
+    delete [] out1_res2;
+    //resblock_body3
+    int8_t *out0_res3;
+    out0_res3 = new int8_t[resblock_body3.maxpool1.out_shape[0]*resblock_body3.maxpool1.out_shape[1]*resblock_body3.maxpool1.out_shape[2]];
+    resblock_body3.forward(out0_res2,out0_res3,out0);
+    
+    //conv4
+
+    fill_n(out1,conv3.conv.out_shape[0]*conv3.conv.out_shape[1]*conv3.conv.out_shape[2],0);
+    conv3.data_update(data_dir+"/conv3/"); 
+    conv3.forward(out0_res3,out1);
+    delete [] out0_res3;
+    //
+    //out0=out1_res3;
+    //out1=out_conv3;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////
 
 
 data_t*** padArray(const data_t* originalArray,int chi, int originalRows, int originalCols) {  
@@ -453,6 +598,25 @@ void tensor2int8(int32_t * in,int8_t * out,int size0,int size1,int size2)
                 }
 }
 
+void concatenate(int8_t * tensor0,int8_t * tensor1, int8_t * out,int channels,int width)
+{
+    out = new int8_t[2*channels*width*width];
+    for (int i=0;i<channels;i++)
+        for (int j=0;j<width;j++)
+            for (int k=0;k<width;k++)
+            {
+                out[(i*width+j)*width+k]=tensor0[(i*width+j)*width+k];
+            }
+    for (int i=0;i<channels;i++)
+        for (int j=0;j<width;j++)
+            for (int k=0;k<width;k++)
+            {
+                out[(i*width+j)*width+k+channels*width*width-1]=tensor1[(i*width+j)*width+k];
+            }    
+
+    
+}
+
 ///////////////////////
 
 
@@ -468,15 +632,19 @@ int main() {
     load_int8_data(in ,  syn_data_dir +"in_q.bin", 3*416*416); 
     cout << "start!" <<endl;
     unsigned int in_shape_i[3]={3,416,416};
-    basic_conv conv1_tst;
-    conv1_tst.init(&in_shape_i[0],32,3,2);
-    conv1_tst.data_update(syn_data_dir);
-    int8_t *Out;
-    Out = new int8_t[32*208*208];
-    conv1_tst.forward(&in[0],Out);
+    csp_dark_net my_csp_tst;
+    my_csp_tst.init();
+    int8_t *Out0;
+    int8_t *Out1;
+    Out0 = new int8_t[my_csp_tst.resblock_body3.conv4.conv.in_shape[0]*my_csp_tst.resblock_body3.conv4.conv.in_shape[1]*my_csp_tst.resblock_body3.conv4.conv.in_shape[2]];
+    Out1 = new int8_t[my_csp_tst.conv3.conv.out_shape[0]*my_csp_tst.conv3.conv.out_shape[1]*my_csp_tst.conv3.conv.out_shape[2]];
+    my_csp_tst.forward(&in[0],Out0,Out1);
     
-    save_int8_data(Out, syn_data_dir + "acc_Out_q.bin" , 32*208*208);
-    delete [] Out;
+    save_int8_data(Out0, syn_data_dir + "csp_feat1_q8.bin" , 256*26*26);
+    save_int8_data(Out1, syn_data_dir + "csp_feat2_q8.bin" , 512*13*13);
+
+    delete [] Out0;
+    delete [] Out1;
     
       
     return 0;  

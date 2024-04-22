@@ -1,0 +1,281 @@
+==18433== Memcheck, a memory error detector
+==18433== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==18433== Using Valgrind-3.22.0 and LibVEX; rerun with -h for copyright info
+==18433== Command: ./tst3
+==18433== Parent PID: 9375
+==18433== 
+==18433== Invalid free() / delete / delete[] / realloc()
+==18433==    at 0x484E46F: operator delete[](void*) (vg_replace_malloc.c:1330)
+==18433==    by 0x10C615: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:454)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433==  Address 0x4de2e10 is 0 bytes inside a block of size 519,168 free'd
+==18433==    at 0x484E46F: operator delete[](void*) (vg_replace_malloc.c:1330)
+==18433==    by 0x10B65A: basic_conv::forward(signed char*, signed char*) (tst3.cpp:325)
+==18433==    by 0x10C5FC: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:453)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433==  Block was alloc'd at
+==18433==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==18433==    by 0x10D050: main (tst3.cpp:621)
+==18433== 
+==18433== Invalid free() / delete / delete[] / realloc()
+==18433==    at 0x484E46F: operator delete[](void*) (vg_replace_malloc.c:1330)
+==18433==    by 0x10C721: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:461)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433==  Address 0x4e6da70 is 0 bytes inside a block of size 1,384,448 free'd
+==18433==    at 0x484E46F: operator delete[](void*) (vg_replace_malloc.c:1330)
+==18433==    by 0x10B65A: basic_conv::forward(signed char*, signed char*) (tst3.cpp:325)
+==18433==    by 0x10C708: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:460)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433==  Block was alloc'd at
+==18433==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==18433==    by 0x10C58D: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:451)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433== 
+==18433== Invalid free() / delete / delete[] / realloc()
+==18433==    at 0x484E46F: operator delete[](void*) (vg_replace_malloc.c:1330)
+==18433==    by 0x10B65A: basic_conv::forward(signed char*, signed char*) (tst3.cpp:325)
+==18433==    by 0x10BBA8: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:384)
+==18433==    by 0x10C74C: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:465)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433==  Address 0x600d8ff is 346,111 bytes inside a block of size 692,224 alloc'd
+==18433==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==18433==    by 0x10B9E3: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:376)
+==18433==    by 0x10C74C: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:465)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433== 
+==18433== Invalid read of size 1
+==18433==    at 0x10CFF7: concatenate(signed char*, signed char*, signed char*, int, int) (tst3.cpp:604)
+==18433==    by 0x10BE94: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:404)
+==18433==    by 0x10C74C: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:465)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433==  Address 0x4fc3b30 is 0 bytes inside a block of size 346,112 free'd
+==18433==    at 0x484E46F: operator delete[](void*) (vg_replace_malloc.c:1330)
+==18433==    by 0x10B65A: basic_conv::forward(signed char*, signed char*) (tst3.cpp:325)
+==18433==    by 0x10BCCB: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:390)
+==18433==    by 0x10C74C: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:465)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433==  Block was alloc'd at
+==18433==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==18433==    by 0x10BAFA: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:382)
+==18433==    by 0x10C74C: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:465)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433== 
+==18433== Invalid free() / delete / delete[] / realloc()
+==18433==    at 0x484E46F: operator delete[](void*) (vg_replace_malloc.c:1330)
+==18433==    by 0x10BEAD: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:405)
+==18433==    by 0x10C74C: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:465)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433==  Address 0x4fc3b30 is 0 bytes inside a block of size 346,112 free'd
+==18433==    at 0x484E46F: operator delete[](void*) (vg_replace_malloc.c:1330)
+==18433==    by 0x10B65A: basic_conv::forward(signed char*, signed char*) (tst3.cpp:325)
+==18433==    by 0x10BCCB: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:390)
+==18433==    by 0x10C74C: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:465)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433==  Block was alloc'd at
+==18433==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==18433==    by 0x10BAFA: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:382)
+==18433==    by 0x10C74C: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:465)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433== 
+==18433== Invalid free() / delete / delete[] / realloc()
+==18433==    at 0x484E46F: operator delete[](void*) (vg_replace_malloc.c:1330)
+==18433==    by 0x10BF06: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:408)
+==18433==    by 0x10C74C: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:465)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433==  Address 0x5c63040 is 0 bytes inside a block of size 692,224 free'd
+==18433==    at 0x484E46F: operator delete[](void*) (vg_replace_malloc.c:1330)
+==18433==    by 0x10B65A: basic_conv::forward(signed char*, signed char*) (tst3.cpp:325)
+==18433==    by 0x10BEED: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:407)
+==18433==    by 0x10C74C: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:465)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433==  Block was alloc'd at
+==18433==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==18433==    by 0x10BD6F: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:394)
+==18433==    by 0x10C74C: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:465)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433== 
+==18433== Invalid free() / delete / delete[] / realloc()
+==18433==    at 0x484E46F: operator delete[](void*) (vg_replace_malloc.c:1330)
+==18433==    by 0x10C765: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:466)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433==  Address 0x511f690 is 0 bytes inside a block of size 692,224 free'd
+==18433==    at 0x484E46F: operator delete[](void*) (vg_replace_malloc.c:1330)
+==18433==    by 0x10B65A: basic_conv::forward(signed char*, signed char*) (tst3.cpp:325)
+==18433==    by 0x10BA56: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:378)
+==18433==    by 0x10C74C: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:465)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433==  Block was alloc'd at
+==18433==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==18433==    by 0x10C68C: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:458)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433== 
+==18433== Conditional jump or move depends on uninitialised value(s)
+==18433==    at 0x10C76E: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:467)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433==  Uninitialised value was created by a stack allocation
+==18433==    at 0x10C4D5: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:446)
+==18433== 
+==18433== Use of uninitialised value of size 8
+==18433==    at 0x10ABE6: conv_2d::padding_forward(signed char*, int*) (tst3.cpp:136)
+==18433==    by 0x10B5F4: basic_conv::forward(signed char*, signed char*) (tst3.cpp:320)
+==18433==    by 0x10BA56: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:378)
+==18433==    by 0x10C7A6: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:471)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433==  Uninitialised value was created by a stack allocation
+==18433==    at 0x10C4D5: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:446)
+==18433== 
+==18433== Invalid read of size 1
+==18433==    at 0x10ABE6: conv_2d::padding_forward(signed char*, int*) (tst3.cpp:136)
+==18433==    by 0x10B5F4: basic_conv::forward(signed char*, signed char*) (tst3.cpp:320)
+==18433==    by 0x10BA56: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:378)
+==18433==    by 0x10C7A6: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:471)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433==  Address 0x11036e is not stack'd, malloc'd or (recently) free'd
+==18433== 
+==18433== 
+==18433== Process terminating with default action of signal 11 (SIGSEGV)
+==18433==  Access not within mapped region at address 0x11036E
+==18433==    at 0x10ABE6: conv_2d::padding_forward(signed char*, int*) (tst3.cpp:136)
+==18433==    by 0x10B5F4: basic_conv::forward(signed char*, signed char*) (tst3.cpp:320)
+==18433==    by 0x10BA56: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:378)
+==18433==    by 0x10C7A6: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:471)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433==  If you believe this happened as a result of a stack
+==18433==  overflow in your program's main thread (unlikely but
+==18433==  possible), you can try to increase the size of the
+==18433==  main thread stack using the --main-stacksize= flag.
+==18433==  The main thread stack size used in this run was 8388608.
+==18433== 
+==18433== HEAP SUMMARY:
+==18433==     in use at exit: 5,067,777 bytes in 15 blocks
+==18433==   total heap usage: 187 allocs, 178 frees, 48,847,412 bytes allocated
+==18433== 
+==18433== 31 bytes in 1 blocks are still reachable in loss record 1 of 15
+==18433==    at 0x4848F75: operator new(unsigned long) (vg_replace_malloc.c:483)
+==18433==    by 0x10E22B: void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag) (basic_string.tcc:219)
+==18433==    by 0x10E018: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&) (basic_string.h:539)
+==18433==    by 0x10DC1C: __static_initialization_and_destruction_0(int, int) (tst3.cpp:14)
+==18433==    by 0x10DD33: _GLOBAL__sub_I__ZN7conv_2d4initEPjjjj (tst3.cpp:778)
+==18433==    by 0x4AE5EBA: call_init (libc-start.c:145)
+==18433==    by 0x4AE5EBA: __libc_start_main@@GLIBC_2.34 (libc-start.c:379)
+==18433==    by 0x10A5F4: (below main) (in /home/derui/work/C_proj/yolo_v4_tiny_baseline/backbone_test/tst3)
+==18433== 
+==18433== 79 bytes in 1 blocks are still reachable in loss record 2 of 15
+==18433==    at 0x4848F75: operator new(unsigned long) (vg_replace_malloc.c:483)
+==18433==    by 0x10E22B: void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag) (basic_string.tcc:219)
+==18433==    by 0x10E018: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&) (basic_string.h:539)
+==18433==    by 0x10DBC1: __static_initialization_and_destruction_0(int, int) (tst3.cpp:13)
+==18433==    by 0x10DD33: _GLOBAL__sub_I__ZN7conv_2d4initEPjjjj (tst3.cpp:778)
+==18433==    by 0x4AE5EBA: call_init (libc-start.c:145)
+==18433==    by 0x4AE5EBA: __libc_start_main@@GLIBC_2.34 (libc-start.c:379)
+==18433==    by 0x10A5F4: (below main) (in /home/derui/work/C_proj/yolo_v4_tiny_baseline/backbone_test/tst3)
+==18433== 
+==18433== 81 bytes in 1 blocks are still reachable in loss record 3 of 15
+==18433==    at 0x4848F75: operator new(unsigned long) (vg_replace_malloc.c:483)
+==18433==    by 0x10E22B: void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag) (basic_string.tcc:219)
+==18433==    by 0x10E018: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&) (basic_string.h:539)
+==18433==    by 0x10DC77: __static_initialization_and_destruction_0(int, int) (tst3.cpp:15)
+==18433==    by 0x10DD33: _GLOBAL__sub_I__ZN7conv_2d4initEPjjjj (tst3.cpp:778)
+==18433==    by 0x4AE5EBA: call_init (libc-start.c:145)
+==18433==    by 0x4AE5EBA: __libc_start_main@@GLIBC_2.34 (libc-start.c:379)
+==18433==    by 0x10A5F4: (below main) (in /home/derui/work/C_proj/yolo_v4_tiny_baseline/backbone_test/tst3)
+==18433== 
+==18433== 161 bytes in 1 blocks are still reachable in loss record 4 of 15
+==18433==    at 0x4848F75: operator new(unsigned long) (vg_replace_malloc.c:483)
+==18433==    by 0x49BC0BD: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6)
+==18433==    by 0x49BDB4F: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_append(char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6)
+==18433==    by 0x10DF65: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*) (basic_string.h:6136)
+==18433==    by 0x10C523: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:447)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433== 
+==18433== 161 bytes in 1 blocks are still reachable in loss record 5 of 15
+==18433==    at 0x4848F75: operator new(unsigned long) (vg_replace_malloc.c:483)
+==18433==    by 0x49BC0BD: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6)
+==18433==    by 0x49BDB4F: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_append(char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6)
+==18433==    by 0x10DF65: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*) (basic_string.h:6136)
+==18433==    by 0x10B94B: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:372)
+==18433==    by 0x10C7A6: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:471)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433== 
+==18433== 512 bytes in 1 blocks are still reachable in loss record 6 of 15
+==18433==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==18433==    by 0x10B2D1: basic_conv::data_update(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (tst3.cpp:289)
+==18433==    by 0x10B99D: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:374)
+==18433==    by 0x10C7A6: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:471)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433== 
+==18433== 1,024 bytes in 1 blocks are still reachable in loss record 7 of 15
+==18433==    at 0x48487EF: malloc (vg_replace_malloc.c:442)
+==18433==    by 0x4B3ABA3: _IO_file_doallocate (filedoalloc.c:101)
+==18433==    by 0x4B49CDF: _IO_doallocbuf (genops.c:347)
+==18433==    by 0x4B48F5F: _IO_file_overflow@@GLIBC_2.2.5 (fileops.c:744)
+==18433==    by 0x4B476D4: _IO_new_file_xsputn (fileops.c:1243)
+==18433==    by 0x4B476D4: _IO_file_xsputn@@GLIBC_2.2.5 (fileops.c:1196)
+==18433==    by 0x4B3BFD6: fwrite (iofwrite.c:39)
+==18433==    by 0x49ACB64: std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6)
+==18433==    by 0x49ACEBA: std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6)
+==18433==    by 0x10D0BD: main (tst3.cpp:623)
+==18433== 
+==18433== 72,704 bytes in 1 blocks are still reachable in loss record 8 of 15
+==18433==    at 0x48487EF: malloc (vg_replace_malloc.c:442)
+==18433==    by 0x491A939: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6)
+==18433==    by 0x400647D: call_init.part.0 (dl-init.c:70)
+==18433==    by 0x4006567: call_init (dl-init.c:33)
+==18433==    by 0x4006567: _dl_init (dl-init.c:117)
+==18433==    by 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+==18433== 
+==18433== 147,456 bytes in 1 blocks are still reachable in loss record 9 of 15
+==18433==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==18433==    by 0x10B30B: basic_conv::data_update(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (tst3.cpp:292)
+==18433==    by 0x10B99D: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:374)
+==18433==    by 0x10C7A6: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:471)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433== 
+==18433== 346,112 bytes in 1 blocks are still reachable in loss record 10 of 15
+==18433==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==18433==    by 0x10B9E3: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:376)
+==18433==    by 0x10C7A6: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:471)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433== 
+==18433== 346,112 bytes in 1 blocks are definitely lost in loss record 11 of 15
+==18433==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==18433==    by 0x10C004: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:415)
+==18433==    by 0x10C74C: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:465)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433== 
+==18433== 692,224 bytes in 1 blocks are definitely lost in loss record 12 of 15
+==18433==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==18433==    by 0x10BDFE: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:397)
+==18433==    by 0x10C74C: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:465)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433== 
+==18433== 692,224 bytes in 1 blocks are definitely lost in loss record 13 of 15
+==18433==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==18433==    by 0x10CEEE: concatenate(signed char*, signed char*, signed char*, int, int) (tst3.cpp:593)
+==18433==    by 0x10BE94: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:404)
+==18433==    by 0x10C74C: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:465)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433== 
+==18433== 1,384,448 bytes in 1 blocks are still reachable in loss record 14 of 15
+==18433==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==18433==    by 0x10B59B: basic_conv::forward(signed char*, signed char*) (tst3.cpp:317)
+==18433==    by 0x10BA56: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:378)
+==18433==    by 0x10C7A6: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:471)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433== 
+==18433== 1,384,448 bytes in 1 blocks are definitely lost in loss record 15 of 15
+==18433==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==18433==    by 0x10CEEE: concatenate(signed char*, signed char*, signed char*, int, int) (tst3.cpp:593)
+==18433==    by 0x10BFCD: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:413)
+==18433==    by 0x10C74C: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:465)
+==18433==    by 0x10D12F: main (tst3.cpp:629)
+==18433== 
+==18433== LEAK SUMMARY:
+==18433==    definitely lost: 3,115,008 bytes in 4 blocks
+==18433==    indirectly lost: 0 bytes in 0 blocks
+==18433==      possibly lost: 0 bytes in 0 blocks
+==18433==    still reachable: 1,952,769 bytes in 11 blocks
+==18433==         suppressed: 0 bytes in 0 blocks
+==18433== 
+==18433== For lists of detected and suppressed errors, rerun with: -s
+==18433== ERROR SUMMARY: 346131 errors from 14 contexts (suppressed: 0 from 0)

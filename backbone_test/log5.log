@@ -1,0 +1,161 @@
+==20860== Memcheck, a memory error detector
+==20860== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==20860== Using Valgrind-3.22.0 and LibVEX; rerun with -h for copyright info
+==20860== Command: ./tst3
+==20860== Parent PID: 9375
+==20860== 
+==20860== Invalid read of size 1
+==20860==    at 0x10ABE6: conv_2d::padding_forward(signed char*, int*) (tst3.cpp:136)
+==20860==    by 0x10B5F4: basic_conv::forward(signed char*, signed char*) (tst3.cpp:320)
+==20860==    by 0x10BA42: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:378)
+==20860==    by 0x10C7BF: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:477)
+==20860==    by 0x10D126: main (tst3.cpp:637)
+==20860==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
+==20860== 
+==20860== 
+==20860== Process terminating with default action of signal 11 (SIGSEGV)
+==20860==  Access not within mapped region at address 0x0
+==20860==    at 0x10ABE6: conv_2d::padding_forward(signed char*, int*) (tst3.cpp:136)
+==20860==    by 0x10B5F4: basic_conv::forward(signed char*, signed char*) (tst3.cpp:320)
+==20860==    by 0x10BA42: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:378)
+==20860==    by 0x10C7BF: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:477)
+==20860==    by 0x10D126: main (tst3.cpp:637)
+==20860==  If you believe this happened as a result of a stack
+==20860==  overflow in your program's main thread (unlikely but
+==20860==  possible), you can try to increase the size of the
+==20860==  main thread stack using the --main-stacksize= flag.
+==20860==  The main thread stack size used in this run was 8388608.
+==20860== 
+==20860== HEAP SUMMARY:
+==20860==     in use at exit: 5,067,777 bytes in 15 blocks
+==20860==   total heap usage: 187 allocs, 172 frees, 48,847,412 bytes allocated
+==20860== 
+==20860== 31 bytes in 1 blocks are still reachable in loss record 1 of 15
+==20860==    at 0x4848F75: operator new(unsigned long) (vg_replace_malloc.c:483)
+==20860==    by 0x10E223: void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag) (basic_string.tcc:219)
+==20860==    by 0x10E010: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&) (basic_string.h:539)
+==20860==    by 0x10DC13: __static_initialization_and_destruction_0(int, int) (tst3.cpp:14)
+==20860==    by 0x10DD2A: _GLOBAL__sub_I__ZN7conv_2d4initEPjjjj (tst3.cpp:786)
+==20860==    by 0x4AE5EBA: call_init (libc-start.c:145)
+==20860==    by 0x4AE5EBA: __libc_start_main@@GLIBC_2.34 (libc-start.c:379)
+==20860==    by 0x10A5F4: (below main) (in /home/derui/work/C_proj/yolo_v4_tiny_baseline/backbone_test/tst3)
+==20860== 
+==20860== 79 bytes in 1 blocks are still reachable in loss record 2 of 15
+==20860==    at 0x4848F75: operator new(unsigned long) (vg_replace_malloc.c:483)
+==20860==    by 0x10E223: void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag) (basic_string.tcc:219)
+==20860==    by 0x10E010: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&) (basic_string.h:539)
+==20860==    by 0x10DBB8: __static_initialization_and_destruction_0(int, int) (tst3.cpp:13)
+==20860==    by 0x10DD2A: _GLOBAL__sub_I__ZN7conv_2d4initEPjjjj (tst3.cpp:786)
+==20860==    by 0x4AE5EBA: call_init (libc-start.c:145)
+==20860==    by 0x4AE5EBA: __libc_start_main@@GLIBC_2.34 (libc-start.c:379)
+==20860==    by 0x10A5F4: (below main) (in /home/derui/work/C_proj/yolo_v4_tiny_baseline/backbone_test/tst3)
+==20860== 
+==20860== 81 bytes in 1 blocks are still reachable in loss record 3 of 15
+==20860==    at 0x4848F75: operator new(unsigned long) (vg_replace_malloc.c:483)
+==20860==    by 0x10E223: void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag) (basic_string.tcc:219)
+==20860==    by 0x10E010: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&) (basic_string.h:539)
+==20860==    by 0x10DC6E: __static_initialization_and_destruction_0(int, int) (tst3.cpp:15)
+==20860==    by 0x10DD2A: _GLOBAL__sub_I__ZN7conv_2d4initEPjjjj (tst3.cpp:786)
+==20860==    by 0x4AE5EBA: call_init (libc-start.c:145)
+==20860==    by 0x4AE5EBA: __libc_start_main@@GLIBC_2.34 (libc-start.c:379)
+==20860==    by 0x10A5F4: (below main) (in /home/derui/work/C_proj/yolo_v4_tiny_baseline/backbone_test/tst3)
+==20860== 
+==20860== 161 bytes in 1 blocks are still reachable in loss record 4 of 15
+==20860==    at 0x4848F75: operator new(unsigned long) (vg_replace_malloc.c:483)
+==20860==    by 0x49BC0BD: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6)
+==20860==    by 0x49BDB4F: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_append(char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6)
+==20860==    by 0x10DF5D: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*) (basic_string.h:6136)
+==20860==    by 0x10C529: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:448)
+==20860==    by 0x10D126: main (tst3.cpp:637)
+==20860== 
+==20860== 161 bytes in 1 blocks are still reachable in loss record 5 of 15
+==20860==    at 0x4848F75: operator new(unsigned long) (vg_replace_malloc.c:483)
+==20860==    by 0x49BC0BD: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6)
+==20860==    by 0x49BDB4F: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_append(char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6)
+==20860==    by 0x10DF5D: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*) (basic_string.h:6136)
+==20860==    by 0x10B937: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:372)
+==20860==    by 0x10C7BF: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:477)
+==20860==    by 0x10D126: main (tst3.cpp:637)
+==20860== 
+==20860== 512 bytes in 1 blocks are still reachable in loss record 6 of 15
+==20860==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==20860==    by 0x10B2D1: basic_conv::data_update(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (tst3.cpp:289)
+==20860==    by 0x10B989: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:374)
+==20860==    by 0x10C7BF: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:477)
+==20860==    by 0x10D126: main (tst3.cpp:637)
+==20860== 
+==20860== 1,024 bytes in 1 blocks are still reachable in loss record 7 of 15
+==20860==    at 0x48487EF: malloc (vg_replace_malloc.c:442)
+==20860==    by 0x4B3ABA3: _IO_file_doallocate (filedoalloc.c:101)
+==20860==    by 0x4B49CDF: _IO_doallocbuf (genops.c:347)
+==20860==    by 0x4B48F5F: _IO_file_overflow@@GLIBC_2.2.5 (fileops.c:744)
+==20860==    by 0x4B476D4: _IO_new_file_xsputn (fileops.c:1243)
+==20860==    by 0x4B476D4: _IO_file_xsputn@@GLIBC_2.2.5 (fileops.c:1196)
+==20860==    by 0x4B3BFD6: fwrite (iofwrite.c:39)
+==20860==    by 0x49ACB64: std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6)
+==20860==    by 0x49ACEBA: std::basic_ostream<char, std::char_traits<char> >& std::operator<< <std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6)
+==20860==    by 0x10D0B4: main (tst3.cpp:631)
+==20860== 
+==20860== 72,704 bytes in 1 blocks are still reachable in loss record 8 of 15
+==20860==    at 0x48487EF: malloc (vg_replace_malloc.c:442)
+==20860==    by 0x491A939: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6)
+==20860==    by 0x400647D: call_init.part.0 (dl-init.c:70)
+==20860==    by 0x4006567: call_init (dl-init.c:33)
+==20860==    by 0x4006567: _dl_init (dl-init.c:117)
+==20860==    by 0x40202C9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+==20860== 
+==20860== 147,456 bytes in 1 blocks are still reachable in loss record 9 of 15
+==20860==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==20860==    by 0x10B30B: basic_conv::data_update(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (tst3.cpp:292)
+==20860==    by 0x10B989: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:374)
+==20860==    by 0x10C7BF: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:477)
+==20860==    by 0x10D126: main (tst3.cpp:637)
+==20860== 
+==20860== 346,112 bytes in 1 blocks are still reachable in loss record 10 of 15
+==20860==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==20860==    by 0x10C009: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:416)
+==20860==    by 0x10C768: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:468)
+==20860==    by 0x10D126: main (tst3.cpp:637)
+==20860== 
+==20860== 346,112 bytes in 1 blocks are still reachable in loss record 11 of 15
+==20860==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==20860==    by 0x10B9CF: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:376)
+==20860==    by 0x10C7BF: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:477)
+==20860==    by 0x10D126: main (tst3.cpp:637)
+==20860== 
+==20860== 692,224 bytes in 1 blocks are definitely lost in loss record 12 of 15
+==20860==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==20860==    by 0x10BE03: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:398)
+==20860==    by 0x10C768: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:468)
+==20860==    by 0x10D126: main (tst3.cpp:637)
+==20860== 
+==20860== 692,224 bytes in 1 blocks are definitely lost in loss record 13 of 15
+==20860==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==20860==    by 0x10CEE5: concatenate(signed char*, signed char*, signed char*, int, int) (tst3.cpp:601)
+==20860==    by 0x10BE99: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:405)
+==20860==    by 0x10C768: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:468)
+==20860==    by 0x10D126: main (tst3.cpp:637)
+==20860== 
+==20860== 1,384,448 bytes in 1 blocks are still reachable in loss record 14 of 15
+==20860==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==20860==    by 0x10B59B: basic_conv::forward(signed char*, signed char*) (tst3.cpp:317)
+==20860==    by 0x10BA42: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:378)
+==20860==    by 0x10C7BF: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:477)
+==20860==    by 0x10D126: main (tst3.cpp:637)
+==20860== 
+==20860== 1,384,448 bytes in 1 blocks are definitely lost in loss record 15 of 15
+==20860==    at 0x484A703: operator new[](unsigned long) (vg_replace_malloc.c:725)
+==20860==    by 0x10CEE5: concatenate(signed char*, signed char*, signed char*, int, int) (tst3.cpp:601)
+==20860==    by 0x10BFD2: resblock_body::forward(signed char*, signed char*, signed char*) (tst3.cpp:414)
+==20860==    by 0x10C768: csp_dark_net::forward(signed char*, signed char*, signed char*) (tst3.cpp:468)
+==20860==    by 0x10D126: main (tst3.cpp:637)
+==20860== 
+==20860== LEAK SUMMARY:
+==20860==    definitely lost: 2,768,896 bytes in 3 blocks
+==20860==    indirectly lost: 0 bytes in 0 blocks
+==20860==      possibly lost: 0 bytes in 0 blocks
+==20860==    still reachable: 2,298,881 bytes in 12 blocks
+==20860==         suppressed: 0 bytes in 0 blocks
+==20860== 
+==20860== For lists of detected and suppressed errors, rerun with: -s
+==20860== ERROR SUMMARY: 4 errors from 4 contexts (suppressed: 0 from 0)
