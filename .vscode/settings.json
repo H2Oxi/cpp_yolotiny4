@@ -46,5 +46,6 @@
         "typeinfo": "cpp",
         "fstream": "cpp",
         "cstring": "cpp"
-    }
+    },
+    "terminal.integrated.scrollback": 150000
 }
