@@ -90,12 +90,12 @@ int load_int32_data(int32_t *buffer , const string dir,streamsize size)
 
 #define Tk 4
 #define Tc 4
-#define Tp 8
+#define Tp 13
 
 //kloop_max=ceil(Pof/Tk)
 #define K_LOOP_MAX 4
 //ploop_max=ceil(Pr*Pc/Tp)
-#define P_LOOP_MAX 32
+#define P_LOOP_MAX 3328
 //cloop_max=ceil(float(Pif)/float(Tc))
 #define C_LOOP_MAX 1
 
@@ -104,13 +104,12 @@ int load_int32_data(int32_t *buffer , const string dir,streamsize size)
 void loop_1(int32_t   bias[Cho_max],int8_t *In_addr,int8_t *W_addr,int8_t *Out_addr,int16_t  M0,int32_t k_loop_max,int32_t p_loop_max,
 	int32_t c_loop_max,int32_t out_map_height,int32_t out_map_width,int32_t out_map_cho,int32_t in_map_chi,
 	int32_t in_map_height,int32_t in_map_width,int32_t ksize,int32_t stride ,int32_t activation_enable,int32_t S_relu);
-void DMA_1(int8_t   in_L2[Tp][Tc],int8_t weights_L1[Tk][Tc],int8_t *In_addr,int8_t *W_addr,int c,int ky,int kx,int k,int p,
+void DMA_L1(int8_t   in_L1[Tp][Tc],int8_t weights_L1[Tk][Tc],int8_t *In_addr,int8_t *W_addr,int c,int ky,int kx,int k,int p,
 	int32_t out_map_cho,int32_t in_map_chi,int32_t in_map_height,int32_t in_map_width,int32_t ksize,int32_t stride,int32_t pad);
-void Loop_2(int8_t   in_L2[Tp][Tc],int8_t weights_L1[Tk][Tc],int32_t   bias[Cho_max],int32_t   out[Tp][Tk],int k,int p,
+void Loop_2(int8_t   in_L1[Tp][Tc],int8_t weights_L1[Tk][Tc],int32_t   bias[Cho_max],int32_t   out[Tp][Tk],int k,int p,
 	int8_t *Out_addr,int8_t *In_addr,int8_t *W_addr,int16_t  M0,int32_t c_loop_max,int32_t out_map_height,int32_t out_map_width,
 	int32_t out_map_cho,int32_t in_map_chi,int32_t in_map_height,int32_t in_map_width,int32_t ksize,int32_t stride,int32_t pad,int32_t activation_enable,int32_t S_relu);
-void PE_Top(int8_t   in_L2[Tp][Tc],int8_t weights_L1[Tk][Tc],int32_t   bias[Cho_max],int32_t   out[Tp][Tk],int c,int ky,int kx,int k,int p,int pp);
-void DMA_2(int8_t   in_L2[Tp][Tc],int8_t in_L1[Tc],int pp);
+void PE_Top(int8_t   in_L1[Tp][Tc],int8_t weights_L1[Tk][Tc],int32_t   bias[Cho_max],int32_t   out[Tp][Tk],int c,int ky,int kx,int k,int p,int pp);
 void PE(int32_t out[Tp][Tk],int8_t in_L1[Tc],int8_t weights_L1[Tk][Tc],int pp);
 void Conv_deal(int8_t *In_addr,int8_t *W_addr,int32_t *B_addr,int8_t *Out_addr,int32_t *Param);
 void Bias_load(int32_t *B_addr,int32_t *bias,int32_t out_map_cho);
@@ -175,23 +174,16 @@ void PE(int32_t out[Tp][Tk],int8_t in_L1[Tc],int8_t weights_L1[Tk][Tc],int pp)
 		}
 }
 
-void DMA_2(int8_t   in_L2[Tp][Tc],int8_t in_L1[Tc],int pp)
-{
-    for(int cc=0;cc<Tc;cc++)
-    {
-		in_L1[cc]=in_L2[pp][cc];
-    }
-}
 
-void PE_Top(int8_t   in_L2[Tp][Tc],int8_t weights_L1[Tk][Tc],int32_t   bias[Cho_max],int32_t   out[Tp][Tk],
+
+void PE_Top(int8_t   in_L1[Tp][Tc],int8_t weights_L1[Tk][Tc],int32_t   bias[Cho_max],int32_t   out[Tp][Tk],
 		int c,int ky,int kx,int k,int p,int pp)
 {
-	int8_t in_L1[Tc]={0};
-	DMA_2( in_L2,in_L1,pp);
-	PE(out,in_L1,weights_L1,pp);
+
+	PE(out,&in_L1[pp][0],weights_L1,pp);
 }
 
-void Loop_2(int8_t   in_L2[Tp][Tc],int8_t weights_L1[Tk][Tc],int32_t   bias[Cho_max],int32_t   out[Tp][Tk],
+void Loop_2(int8_t   in_L1[Tp][Tc],int8_t weights_L1[Tk][Tc],int32_t   bias[Cho_max],int32_t   out[Tp][Tk],
     int k,int p,int8_t *Out_addr,int8_t *In_addr,int8_t *W_addr,int16_t  M0,int32_t c_loop_max,int32_t out_map_height,
     int32_t out_map_width,int32_t out_map_cho,int32_t in_map_chi,int32_t in_map_height,int32_t in_map_width,int32_t ksize,
 	int32_t stride,int32_t pad,int32_t activation_enable,int32_t S_relu )
@@ -201,11 +193,11 @@ void Loop_2(int8_t   in_L2[Tp][Tc],int8_t weights_L1[Tk][Tc],int32_t   bias[Cho_
 		for(int ky=0;ky<ksize;ky++)
 			for(int kx=0;kx<ksize;kx++)
 				{
-                    DMA_1(   in_L2, weights_L1, In_addr, W_addr, c, ky, kx, k, p, out_map_cho, in_map_chi, in_map_height, in_map_width,ksize,stride,pad);
+                    DMA_L1(   in_L1, weights_L1, In_addr, W_addr, c, ky, kx, k, p, out_map_cho, in_map_chi, in_map_height, in_map_width,ksize,stride,pad);
                     for(int pp=0;pp<Tp;pp++)
                     {
                         if(p*Tp+pp<Pr*Pc)
-				            PE_Top( in_L2, weights_L1, bias, out, c, ky, kx, k, p,pp);
+				            PE_Top( in_L1, weights_L1, bias, out, c, ky, kx, k, p,pp);
                     }
 				}
 	for(int pp=0;pp<Tp;pp++)
@@ -243,7 +235,34 @@ void Loop_2(int8_t   in_L2[Tp][Tc],int8_t weights_L1[Tk][Tc],int32_t   bias[Cho_
 	}
 }
 
-void DMA_1(int8_t   in_L2[Tp][Tc],int8_t weights_L1[Tk][Tc],int8_t *In_addr,int8_t *W_addr,int c,int ky,int kx,int k,int p,
+void DMA_L2(int8_t   in_L2[128][Tp][Tc],int8_t weights_L2[128][3][3][Tk][Tc],int8_t *In_addr,int8_t *W_addr,int k,int p,
+    int32_t out_map_cho,int32_t in_map_chi,int32_t in_map_height,int32_t in_map_width,int32_t c_loop_max,int32_t ksize,int32_t stride,)
+{
+	for(int c=0;c<c_loop_max;c++)
+		for(int ky=0;ky<ksize;ky++)
+			for(int kx=0;kx<ksize;kx++)
+				for(int pp=0;pp<Tp;pp++)
+				{
+					for(int cc=0;cc<Tc;cc++)
+					{
+						int h=(p*Tp+pp)/Pr;
+						int w=(p*Tp+pp)%Pr;
+						int in_offset=((c*Tc+cc)*in_map_height+h*stride+ky)*in_map_width+w*stride+kx;
+						in_L2[c][pp][cc]=In_addr
+					}
+					
+				}
+
+	for(int c=0;c<c_loop_max;c++)
+		for(int ky=0;ky<ksize;ky++)
+			for(int kx=0;kx<ksize;kx++)
+				{
+					in_L2[c][pp][cc]
+				}
+
+}
+
+void DMA_L1(int8_t   in_L1[Tp][Tc],int8_t weights_L1[Tk][Tc],int8_t *In_addr,int8_t *W_addr,int c,int ky,int kx,int k,int p,
     int32_t out_map_cho,int32_t in_map_chi,int32_t in_map_height,int32_t in_map_width,int32_t ksize,int32_t stride,int32_t pad)
 {
 	for(int pp=0;pp<Tp;pp++)
@@ -259,19 +278,19 @@ void DMA_1(int8_t   in_L2[Tp][Tc],int8_t weights_L1[Tk][Tc],int8_t *In_addr,int8
 						{
 
 							int in_offset=((c*Tc+cc)*in_map_height+h*stride+ky-pad)*in_map_width+w*stride+kx-pad;
-							in_L2[pp][cc]	    =  In_addr[in_offset];   //In_addr[c*Tc+cc][h*S+ky][w*S+kx];
+							in_L1[pp][cc]	    =  In_addr[in_offset];   //In_addr[c*Tc+cc][h*S+ky][w*S+kx];[c][cc][p][pp]
 							int w_offset=(((k*Tk+kk)*in_map_chi+c*Tc+cc)*ksize+ky)*ksize+kx;
 							weights_L1[kk][cc]  =  W_addr[w_offset];                  //W_addr[k*Tk+kk][c*Tc+cc][ky][kx];
 						}
 						else if(	(ksize!=1)	&&(((h*stride+ky)==0) || ((h*stride+ky)==(in_map_height+1)) || ((w*stride+kx)==0) || ((w*stride+kx)==(in_map_width+1)))	)
 						{
-							in_L2[pp][cc]=0;
+							in_L1[pp][cc]=0;
 							int w_offset=(((k*Tk+kk)*in_map_chi+c*Tc+cc)*ksize+ky)*ksize+kx;
 							weights_L1[kk][cc]  =  W_addr[w_offset]; 
 						}
 						else
 						{
-							in_L2[pp][cc]=0;
+							in_L1[pp][cc]=0;
 							weights_L1[kk][cc]=0;
 						}
 					}
@@ -283,7 +302,7 @@ void loop_1(int32_t   bias[Cho_max],int8_t *In_addr,int8_t *W_addr,int8_t *Out_a
     int32_t out_map_height,int32_t out_map_width,int32_t out_map_cho,int32_t in_map_chi,int32_t in_map_height,int32_t in_map_width,
 	int32_t ksize,int32_t stride,int32_t activation_enable,int32_t S_relu)
 {
-    int8_t    in_L2[Tp][Tc]={0};                //In[Pif][S*Pr+K-S][S*Pc+K-S];
+    int8_t    in_L1[Tp][Tc]={0};                //In[Pif][S*Pr+K-S][S*Pc+K-S];
     int8_t    weights_L1[Tk][Tc]={0};           //W[Pof][Pif][K][K];
              
     int32_t pad=(ksize==1)?0:1;
@@ -307,7 +326,7 @@ void loop_1(int32_t   bias[Cho_max],int8_t *In_addr,int8_t *W_addr,int8_t *Out_a
 		for(int p=0;p<p_loop_max;p++)
 		{
 			int32_t   out[Tp][Tk]={0};                  //Out[Pof][Pr][Pc]; 
-            Loop_2( in_L2, weights_L1,   bias,   out,k, p,Out_addr,In_addr, W_addr,  M0, c_loop_max,out_map_height, out_map_width, out_map_cho, in_map_chi, in_map_height, in_map_width, ksize, stride,pad,activation_enable, S_relu);
+            Loop_2( in_L1, weights_L1,   bias,   out,k, p,Out_addr,In_addr, W_addr,  M0, c_loop_max,out_map_height, out_map_width, out_map_cho, in_map_chi, in_map_height, in_map_width, ksize, stride,pad,activation_enable, S_relu);
 
         }
 }

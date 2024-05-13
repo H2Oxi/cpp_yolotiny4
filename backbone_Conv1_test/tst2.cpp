@@ -161,6 +161,10 @@ void conv_2d::padding_forward(data_t *x ,int32_t *out)
 						}
                         if((kc==ksize-1)&&(kr==ksize-1))
                         {
+                            if(out_offset==0)
+                            {
+                                std::cout<<"out["<< out_offset <<"]="<<*(out+out_offset);
+                            }
                             *(out+out_offset) += bias[o];
                             if(out_offset==0)
                                 std::cout<<"out["<< out_offset <<"]="<<*(out+out_offset);
